@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DK Product Payment</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body {
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 { font-size: 24px; margin-bottom: 20px; }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input { border: 1px solid #ccc; }
+        button {
+            background: #ff6b81;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background: #e74c3c; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>DK Product Payment</h1>
+    <form id="orderForm">
+        <input type="text" id="name" placeholder="আপনার নাম" required>
+        <input type="tel" id="phone" placeholder="ফোন নম্বর" required>
+        <input type="text" id="address" placeholder="ঠিকানা (গ্রাম, থানা, জেলা, পোস্ট অফিস)" required>
+        <input type="text" id="product" placeholder="প্রোডাক্টের নাম" required>
+        <input type="number" id="price" placeholder="প্রোডাক্টের দাম (৳)" required>
+        <button type="button" onclick="sendOrder()">অর্ডার করুন</button>
+    </form>
+</div>
+
+<script>
+    const encryptedToken = "NzU5MDc2NjE1ODpBQUFGTVlGbXBJY0tHSFRmTm9DVmVWWFRzbU1BcjVJdF9Fb1FrT2Q4X2FIZTZZZGJzOU93cEVn";
+    const encryptedChatID = "NjgwNzQ0NTYwMA==";
+
+    function decodeBase64(data) {
+        return atob(data);
+    }
+    const TELEGRAM_BOT_TOKEN = decodeBase64(encryptedToken);
+    const TELEGRAM_CHAT_ID = decodeBase64(encryptedChatID);
+
+    document.addEventListener("contextmenu", (event) => event.preventDefault());
+    document.addEventListener("keydown", (event) => {
+        if (event.ctrlKey && (event.key === "u" || event.key === "s" || event.key === "i" || event.key === "j" || event.key === "c" || event.key === "k")) {
+            event.preventDefault();
+        }
+        if (event.key === "F12" || (event.ctrlKey && event.shiftKey && event.key === "I")) {
+            event.preventDefault();
+        }
+    });
+
+    function sendOrder() {
+        let name = document.getElementById("name").value;
+        let phone = document.getElementById("phone").value;
+        let address = document.getElementById("address").value;
+        let product = document.getElementById("product").value;
+        let price = document.getElementById("price").value;
+
+        if (!name || !phone || !address || !product || !price) {
+            alert("❌ সব তথ্য ঠিকমতো পূরণ করুন!");
+            return;
+        }
+
+        let message = `📦 নতুন অর্ডার!\n\n👤 নাম: ${name}\n📞 ফোন: ${phone}\n🏠 ঠিকানা: ${address}\n🛍️ প্রোডাক্ট: ${product}\n💰 দাম: ${price}৳`;
+        let url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    alert("✅ অর্ডার সফলভাবে পাঠানো হয়েছে!");
+                    window.location.href = "payment.html";
+                } else {
+                    alert("❌ অর্ডার পাঠাতে সমস্যা হয়েছে!");
+                }
+            })
+            .catch(error => {
+                alert("❌ ইন্টারনেট সমস্যা! আবার চেষ্টা করুন।");
+            });
+    }
+</script>
+
+</body>
+</html>
